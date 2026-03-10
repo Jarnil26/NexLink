@@ -99,6 +99,10 @@
           background: rgba(255, 255, 255, 0.05);
           color: var(--accent);
         }
+
+        &.close-desktop-btn:hover {
+          color: #ef4444; /* Red color for close */
+        }
       }
     }
   }
@@ -338,7 +342,7 @@
       height: 56px;
       padding: 0 16px;
       .header-left { gap: 8px; .mobile-back { display: block; } }
-      .header-right { gap: 4px; .header-action-btn { width: 32px; height: 32px; } }
+      .header-right { gap: 4px; .header-action-btn { width: 32px; height: 32px; } .close-desktop-btn { display: none; } }
     }
 
     .conversation-area { padding: 16px; }
