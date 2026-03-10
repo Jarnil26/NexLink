@@ -21,10 +21,7 @@ services:
       - key: Jwt__Audience
         value: ChatPlatformClients
       - key: AllowedOrigins
-        fromService:
-          name: chat-frontend
-          type: web
-          property: url
+        value: https://chat-frontend.onrender.com
 
   # Frontend Web App
   - type: web
@@ -34,11 +31,8 @@ services:
     dockerfilePath: Dockerfile
     plan: free # or starter
     envVars:
-      - key: API_URL # If we want to override Nginx logic
-        fromService:
-          name: chat-api
-          type: web
-          property: url
+      - key: API_URL
+        value: https://chat-api.onrender.com
 
   # Redis Instance
   - type: redis
