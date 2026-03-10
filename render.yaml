@@ -3,7 +3,8 @@ services:
   - type: web
     name: chat-api
     env: docker
-    rootDir: ChatPlatform
+    dockerContext: ChatPlatform
+    dockerfilePath: Dockerfile
     plan: free
     envVars:
       - key: ConnectionStrings__MongoDb
@@ -20,17 +21,18 @@ services:
       - key: Jwt__Audience
         value: ChatPlatformClients
       - key: AllowedOrigins
-        value: https://chat-frontend.onrender.com
+        value: https://chat-frontend-kuj4.onrender.com # Updated with your actual URL suffix
 
   # Frontend Web App
   - type: web
     name: chat-frontend
     env: docker
-    rootDir: frontend
+    dockerContext: frontend
+    dockerfilePath: Dockerfile
     plan: free
     envVars:
       - key: API_URL
-        value: https://chat-api.onrender.com
+        value: https://chat-api.onrender.com # You may need to update this suffix after backend is live
 
   # Redis Instance
   - type: redis
