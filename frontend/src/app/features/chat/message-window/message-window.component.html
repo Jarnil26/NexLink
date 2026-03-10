@@ -1,0 +1,83 @@
+<div class="message-window-premium" *ngIf="otherUser">
+  <!-- 1. Header Area (60px) -->
+  <header class="chat-header">
+    <div class="header-left">
+      <button class="mobile-back" (click)="close()">
+        <i class="fa fa-arrow-left"></i>
+      </button>
+      <div class="header-avatar" [class.online]="otherUser.isOnline">
+        <img *ngIf="otherUser.avatar" [src]="otherUser.avatar" alt="Avatar">
+        <span *ngIf="!otherUser.avatar">{{ otherUser.username.charAt(0) | uppercase }}</span>
+      </div>
+      <div class="header-info">
+        <h3 class="username">{{ otherUser.username }}</h3>
+        <span class="status-text">{{ otherUser.isOnline ? 'Active now' : 'Offline' }}</span>
+      </div>
+    </div>
+    <div class="header-right">
+      <button class="header-action-btn"><i class="fa fa-phone"></i></button>
+      <button class="header-action-btn"><i class="fa fa-video"></i></button>
+      <button class="header-action-btn"><i class="fa fa-ellipsis-v"></i></button>
+    </div>
+  </header>
+
+  <!-- 2. Conversation Area -->
+  <div class="conversation-area" #scrollContainer *ngIf="!isLocked">
+    <div class="message-bubble-wrapper" *ngFor="let msg of messages; let last = last" [class.sender]="msg.senderId === currentUser.id">
+      <div class="bubble-container">
+        <div class="bubble">
+          <div class="text-content">{{ msg.content }}</div>
+        </div>
+        <div class="bubble-meta">
+          <span class="time">{{ msg.sentAt | date:'h:mm a' }}</span>
+          <i class="fa fa-check read-mark" *ngIf="msg.senderId === currentUser.id" [class.delivered]="msg.isRead"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. Permission/Lock View -->
+  <div class="premium-lock" *ngIf="isLocked">
+    <div class="lock-card">
+      <div class="lock-illustration">
+         <i class="fa fa-shield-alt"></i>
+      </div>
+      <h3>Conversation Restricted</h3>
+      <p>Ensure you are connected before starting a secure messaging session.</p>
+      
+      <ng-container [ngSwitch]="lockStatus">
+        <button *ngSwitchCase="'NoConnection'" class="btn-premium" (click)="sendConnectionRequest()">Connect to Message</button>
+        <button *ngSwitchCase="'NoChatRequest'" class="btn-premium" (click)="sendChatRequest()">Request Chat Access</button>
+        <div *ngSwitchCase="'ConnectionPending'" class="pending-badge">Connection Request Pending</div>
+        <div *ngSwitchCase="'ChatPending'" class="pending-badge">Chat Request Pending</div>
+      </ng-container>
+    </div>
+  </div>
+
+  <!-- 4. Input Area -->
+  <footer class="chat-input-area" *ngIf="!isLocked">
+    <div class="input-pill">
+      <button class="extra-btn"><i class="fa fa-paperclip"></i></button>
+      <input type="text" 
+             #messageInput
+             [(ngModel)]="newMessage" 
+             (keyup.enter)="sendMessage()" 
+             (input)="onTyping()"
+             placeholder="Type a message...">
+      <button class="extra-btn"><i class="fa fa-smile"></i></button>
+    </div>
+    <button class="send-circle" (click)="sendMessage()" [disabled]="!newMessage.trim()">
+      <i class="fa fa-paper-plane"></i>
+    </button>
+  </footer>
+</div>
+
+<!-- Initial Empty State -->
+<div class="empty-detail-state" *ngIf="!otherUser">
+  <div class="empty-vfx">
+    <div class="glow-orb"></div>
+    <i class="fa fa-comment-dots"></i>
+  </div>
+  <h3>Your Conversations</h3>
+  <p>Select a friend from the left to start chatting securely.</p>
+</div>

@@ -1,0 +1,32 @@
+<div class="auth-container">
+  <div class="auth-card">
+    <h2>Create Account</h2>
+    
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+      <div class="form-field">
+        <input type="text" formControlName="username" placeholder="Username" />
+      </div>
+      
+      <div class="form-field">
+        <input type="email" formControlName="email" placeholder="Email" />
+      </div>
+      
+      <div class="form-field">
+        <input type="password" formControlName="password" placeholder="Password (min 6 chars)" />
+      </div>
+
+      <div *ngIf="error" class="error-message" style="color: #e94560; text-align: center; margin-bottom: 1rem;">
+        {{ error }}
+      </div>
+
+      <button type="submit" class="submit-btn" [disabled]="loading || registerForm.invalid">
+        {{ loading ? 'Registering...' : 'Sign Up' }}
+      </button>
+
+      <div class="links" style="margin-top: 1.5rem; text-align: center;">
+        <span style="color: #fff;">Already have an account? </span>
+        <a routerLink="/login" style="color: #e94560; font-weight: bold;">Login</a>
+      </div>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,47 @@
+services:
+  # Backend API
+  - type: web
+    name: chat-api
+    env: docker
+    dockerContext: ChatPlatform
+    dockerfilePath: Dockerfile
+    plan: free # or starter
+    envVars:
+      - key: ConnectionStrings__MongoDb
+        sync: false
+      - key: ConnectionStrings__Redis
+        fromService:
+          name: chat-redis
+          type: redis
+          property: connectionString
+      - key: Jwt__Key
+        generateValue: true
+      - key: Jwt__Issuer
+        value: ChatPlatformApi
+      - key: Jwt__Audience
+        value: ChatPlatformClients
+      - key: AllowedOrigins
+        fromService:
+          name: chat-frontend
+          type: web
+          property: url
+
+  # Frontend Web App
+  - type: web
+    name: chat-frontend
+    env: docker
+    dockerContext: frontend
+    dockerfilePath: Dockerfile
+    plan: free # or starter
+    envVars:
+      - key: API_URL # If we want to override Nginx logic
+        fromService:
+          name: chat-api
+          type: web
+          property: url
+
+  # Redis Instance
+  - type: redis
+    name: chat-redis
+    plan: free # or starter
+    ipAllowList: [] # Only allow internal traffic

@@ -1,0 +1,136 @@
+<div class="app-container" [class.active-chat]="selectedChatId || selectedUserId" [class.mobile-view]="true">
+  <!-- 1. Navigation Sidebar (70px) -->
+  <nav class="nav-sidebar">
+    <div class="nav-top">
+      <div class="logo">
+        <i class="fa fa-comments"></i>
+      </div>
+      <button class="nav-item" [class.active]="currentView === 'chats'" (click)="switchView('chats')" title="Chats">
+        <i class="fa fa-home"></i>
+      </button>
+      <button class="nav-item" [class.active]="currentView === 'search'" (click)="switchView('search')" title="Search">
+        <i class="fa fa-search"></i>
+      </button>
+      <button class="nav-item" [class.active]="currentView === 'notifications'" (click)="switchView('notifications')" title="Notifications">
+        <i class="fa fa-bell"></i>
+        <span class="badge-dot" *ngIf="notificationCount > 0"></span>
+      </button>
+    </div>
+    
+    <div class="nav-bottom">
+      <button class="nav-item" [class.active]="currentView === 'settings'" (click)="switchView('settings')" title="Settings">
+        <i class="fa fa-cog"></i>
+      </button>
+      <div class="user-trigger" [class.active]="currentView === 'profile'" (click)="switchView('profile')">
+        <div class="avatar-mini">
+          <img *ngIf="currentUser?.avatar" [src]="currentUser.avatar" alt="Avatar">
+          <span *ngIf="!currentUser?.avatar">{{ currentUser?.username?.charAt(0) | uppercase }}</span>
+        </div>
+      </div>
+      <button class="logout-btn" (click)="logout()" title="Logout">
+        <i class="fa fa-sign-out"></i>
+      </button>
+    </div>
+  </nav>
+
+  <!-- 2. Sidebar Content (Chats/Search/etc) -->
+  <aside class="sidebar-content">
+    <div class="sidebar-header-new">
+      <h2 *ngIf="currentView === 'chats'">Messages</h2>
+      <h2 *ngIf="currentView === 'search'">Discover</h2>
+      <h2 *ngIf="currentView === 'notifications'">Alerts</h2>
+      <h2 *ngIf="currentView === 'profile'">Profile</h2>
+      <h2 *ngIf="currentView === 'settings'">Settings</h2>
+    </div>
+
+    <div class="view-container">
+      <ng-container [ngSwitch]="currentView">
+        <div *ngSwitchCase="'chats'">
+          <app-chat-list (chatSelected)="onChatSelected($event)" (userSelected)="onUserSelected($event)"></app-chat-list>
+        </div>
+        <div *ngSwitchCase="'search'">
+          <!-- Reuse chat list for now as it contains search, but filter it -->
+          <app-chat-list [showOnlySearch]="true" (chatSelected)="onChatSelected($event)" (userSelected)="onUserSelected($event)"></app-chat-list>
+        </div>
+        <div *ngSwitchCase="'notifications'" class="placeholder-view">
+          <app-notification-panel></app-notification-panel>
+        </div>
+        <div *ngSwitchCase="'profile'" class="shell-view">
+          <div class="shell-content">
+            <div class="profile-card">
+              <div class="large-avatar">
+                <img *ngIf="currentUser?.avatar" [src]="currentUser.avatar" alt="Avatar">
+                <span *ngIf="!currentUser?.avatar">{{ currentUser?.username?.charAt(0) | uppercase }}</span>
+              </div>
+              <h3>{{ currentUser?.username }}</h3>
+              <p>{{ currentUser?.email }}</p>
+              <div class="bio-placeholder">"Life is what happens when you're busy making other plans."</div>
+            </div>
+            <div class="shell-actions">
+              <button class="shell-btn"><i class="fa fa-user-edit"></i> Edit Profile</button>
+              <button class="shell-btn"><i class="fa fa-shield-alt"></i> Privacy & Security</button>
+              <button class="shell-btn danger" (click)="logout()"><i class="fa fa-sign-out-alt"></i> Sign Out</button>
+            </div>
+          </div>
+        </div>
+
+        <div *ngSwitchCase="'settings'" class="shell-view">
+          <div class="shell-content">
+            <div class="settings-group">
+              <div class="group-title">Appearance</div>
+              <div class="setting-item">
+                <div class="setting-label">
+                  <i class="fa fa-moon"></i>
+                  <span>Dark Mode</span>
+                </div>
+                <span class="setting-value">Always On</span>
+              </div>
+              <div class="setting-item">
+                <div class="setting-label">
+                  <i class="fa fa-font"></i>
+                  <span>Typography</span>
+                </div>
+                <span class="setting-value">Inter / Poppins</span>
+              </div>
+            </div>
+            <div class="settings-group">
+              <div class="group-title">Notifications</div>
+              <div class="setting-item">
+                <div class="setting-label">
+                  <i class="fa fa-bell"></i>
+                  <span>Desktop Alerts</span>
+                </div>
+                <span class="setting-value">Enabled</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div *ngSwitchDefault class="placeholder-view">
+          <div class="empty-vfx">
+            <i class="fa fa-layer-group"></i>
+          </div>
+          <p>Additional modules coming soon</p>
+        </div>
+      </ng-container>
+    </div>
+  </aside>
+
+  <!-- 3. Main Chat Window -->
+  <main class="main-area" [class.visible-mobile]="selectedChatId || selectedUserId">
+    <app-message-window 
+      *ngIf="selectedChatId || selectedUserId" 
+      [chatId]="selectedChatId"
+      [userId]="selectedUserId"
+      (closeChat)="onChatClosed()">
+    </app-message-window>
+    
+    <div *ngIf="!selectedChatId && !selectedUserId" class="empty-state">
+      <div class="empty-content">
+        <div class="empty-icon">💬</div>
+        <h2>Select a conversation</h2>
+        <p>Pick someone from the list to start a premium chat experience.</p>
+      </div>
+    </div>
+  </main>
+</div>

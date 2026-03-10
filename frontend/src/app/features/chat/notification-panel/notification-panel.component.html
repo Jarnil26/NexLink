@@ -1,0 +1,63 @@
+<div class="notification-panel">
+  <div class="panel-header">
+    <h3>Activity Center</h3>
+  </div>
+
+  <div class="requests-list">
+    <!-- Connection Requests -->
+    <div *ngIf="connectionRequests.length > 0" class="section">
+      <div class="section-title">Connection Requests</div>
+      <div class="request-card" *ngFor="let req of connectionRequests">
+        <div class="request-info">
+          <div class="avatar">{{ req.fromUsername.charAt(0) | uppercase }}</div>
+          <div class="text">
+            <strong>{{ req.fromUsername }}</strong> sent you a connection request
+          </div>
+        </div>
+        <div class="request-actions">
+          <button class="accept" (click)="respondToConnection(req.id, 'Accepted')">
+            Accept
+          </button>
+          <button class="reject" (click)="respondToConnection(req.id, 'Rejected')" title="Decline">
+            <i class="fa fa-times"></i>
+          </button>
+          <button class="block" (click)="respondToConnection(req.id, 'Blocked')" title="Block User">
+            <i class="fa fa-ban"></i>
+          </button>
+          <button class="report" (click)="respondToConnection(req.id, 'Reported')" title="Report User">
+            <i class="fa fa-flag"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chat Requests -->
+    <div *ngIf="chatRequests.length > 0" class="section">
+      <div class="section-title">Chat Invitations</div>
+      <div class="request-card" *ngFor="let req of chatRequests">
+        <div class="request-info">
+          <div class="avatar">{{ req.fromUsername.charAt(0) | uppercase }}</div>
+          <div class="text">
+            <strong>{{ req.fromUsername }}</strong> wants to start a secure chat
+          </div>
+        </div>
+        <div class="request-actions">
+          <button class="accept" (click)="respondToChat(req.id, 'Accepted')">
+            Join Chat
+          </button>
+          <button class="reject" (click)="respondToChat(req.id, 'Rejected')" title="Decline">
+            <i class="fa fa-times"></i>
+          </button>
+          <button class="block" (click)="respondToChat(req.id, 'Blocked')" title="Block User">
+            <i class="fa fa-ban"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="connectionRequests.length === 0 && chatRequests.length === 0" class="empty-state">
+      <i class="fa fa-bell-slash"></i>
+      <p>All caught up! No new notifications.</p>
+    </div>
+  </div>
+</div>

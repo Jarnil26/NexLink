@@ -1,0 +1,28 @@
+<div class="auth-container">
+  <div class="auth-card">
+    <h2>Welcome Back</h2>
+    
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+      <div class="form-field">
+        <input type="text" formControlName="username" placeholder="Username" />
+      </div>
+      
+      <div class="form-field">
+        <input type="password" formControlName="password" placeholder="Password" />
+      </div>
+
+      <div *ngIf="error" class="error-message" style="color: #e94560; text-align: center; margin-bottom: 1rem;">
+        {{ error }}
+      </div>
+
+      <button type="submit" class="submit-btn" [disabled]="loading || loginForm.invalid">
+        {{ loading ? 'Logging in...' : 'Login' }}
+      </button>
+
+      <div class="links" style="margin-top: 1.5rem; text-align: center;">
+        <span style="color: #fff;">Don't have an account? </span>
+        <a routerLink="/register" style="color: #e94560; font-weight: bold;">Register</a>
+      </div>
+    </form>
+  </div>
+</div>

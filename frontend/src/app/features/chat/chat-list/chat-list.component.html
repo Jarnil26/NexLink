@@ -1,0 +1,115 @@
+<div class="chat-list-sidebar-inner">
+  <!-- Search Bar Section -->
+  <div class="search-section" *ngIf="!showOnlySearch || showOnlySearch">
+    <div class="search-pill">
+      <i class="fa fa-search"></i>
+      <input type="text" 
+             [(ngModel)]="searchQuery" 
+             (input)="onSearchChange()" 
+             placeholder="Search users...">
+      <button *ngIf="searchQuery" class="clear-btn" (click)="clearSearch()">
+        <i class="fa fa-times"></i>
+      </button>
+    </div>
+  </div>
+
+  <div class="scroll-area">
+    <!-- Search Results View -->
+    <div *ngIf="searchQuery && searchResults" class="view-section results-section">
+      <div class="section-header">Results</div>
+      <div class="premium-item" *ngFor="let user of searchResults">
+        <div class="item-avatar">
+          <img *ngIf="user.avatar" [src]="user.avatar" alt="Avatar">
+          <span *ngIf="!user.avatar">{{ user.username.charAt(0) | uppercase }}</span>
+          <span class="online-indicator" *ngIf="user.isOnline"></span>
+        </div>
+        <div class="item-content">
+          <div class="item-name">{{ user.username }}</div>
+          <div class="item-actions">
+            <!-- Connection Buttons -->
+            <button *ngIf="user.connectionStatus === 'NoConnection'" 
+                    class="pill-btn tiny accent" (click)="sendConnectionRequest(user.id)">
+              Connect
+            </button>
+            
+            <span *ngIf="user.connectionStatus === 'Pending'" class="status-msg">
+              Request Sent
+            </span>
+
+            <ng-container *ngIf="user.connectionStatus === 'Accepted'">
+              <button *ngIf="user.chatRequestStatus === 'NoChatRequest'" 
+                      class="pill-btn tiny accent" (click)="sendChatRequest(user.id)">
+                Request Chat
+              </button>
+              <span *ngIf="user.chatRequestStatus === 'Pending'" class="status-msg">
+                Pending Chat
+              </span>
+              <button *ngIf="user.chatRequestStatus === 'Accepted'" 
+                      class="pill-btn tiny" (click)="selectUser(user.id)">
+                Open
+              </button>
+            </ng-container>
+          </div>
+        </div>
+      </div>
+      <div *ngIf="searchResults.length === 0" class="empty-hint">No matches found</div>
+    </div>
+
+    <!-- Main Lists (Only if not in search-only view or search is active) -->
+    <ng-container *ngIf="!searchQuery && !showOnlySearch">
+      <!-- Active Chats -->
+      <div class="view-section" *ngIf="chats.length > 0">
+        <div class="section-header">Active Chats</div>
+        <div class="premium-item chat-item" 
+             *ngFor="let chat of chats" 
+             (click)="selectChat(chat.id)"
+             [class.active]="selectedChatId === chat.id"
+             [class.unread]="chat.unreadMessageCount > 0">
+          <div class="item-avatar">
+            <img *ngIf="getOtherParticipant(chat).avatar" [src]="getOtherParticipant(chat).avatar" alt="Avatar">
+            <span *ngIf="!getOtherParticipant(chat).avatar">{{ getOtherParticipant(chat).username.charAt(0) | uppercase }}</span>
+            <span class="online-indicator" *ngIf="getOtherParticipant(chat).isOnline"></span>
+          </div>
+          <div class="item-content">
+            <div class="item-top">
+              <span class="item-name">{{ getOtherParticipant(chat).username }}</span>
+              <span class="item-time">{{ getLatestMessageTime(chat) }}</span>
+            </div>
+            <div class="item-preview">
+              {{ chat.messages && chat.messages.length > 0 ? chat.messages[chat.messages.length - 1].content : (chat.lastMessage ? chat.lastMessage.content : '') }}
+            </div>
+          </div>
+          <div class="item-badge" *ngIf="chat.unreadMessageCount > 0">
+            {{ chat.unreadMessageCount }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Connections (Not in active chats) -->
+      <div class="view-section" *ngIf="connections.length > 0">
+        <div class="section-header">Connections</div>
+        <div class="premium-item" 
+             *ngFor="let conn of connections" 
+             (click)="selectUser(conn.id)"
+             [class.active]="selectedUserId === conn.id">
+          <div class="item-avatar">
+            <img *ngIf="conn.avatar" [src]="conn.avatar" alt="Avatar">
+            <span *ngIf="!conn.avatar">{{ conn.username.charAt(0) | uppercase }}</span>
+            <span class="online-indicator" *ngIf="conn.isOnline"></span>
+          </div>
+          <div class="item-content">
+            <div class="item-name">{{ conn.username }}</div>
+            <div class="item-preview">
+              <span *ngIf="conn.chatRequestStatus === 'NoChatRequest'" class="link-label">Tap to start chat</span>
+              <span *ngIf="conn.chatRequestStatus === 'Pending'" class="status-msg">Request sent</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+
+    <div *ngIf="!searchQuery && !showOnlySearch && chats.length === 0 && connections.length === 0" class="empty-hint">
+      Your inbox is currently empty.
+    </div>
+  </div>
+</div>

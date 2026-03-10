@@ -1,0 +1,296 @@
+CHAT PLATFORM PROJECT DOCUMENTATION
+
+1.  PROJECT OVERVIEW The Chat Platform is a real-time messaging system
+    that allows users to connect, send connection requests, start chats,
+    and exchange messages instantly. The system uses WebSocket-based
+    communication to enable real-time interaction between users.
+
+Main capabilities: - User authentication and authorization - User
+connection requests - Chat requests - Real-time messaging - Message
+history storage - Online/offline presence tracking - Typing indicators -
+Read receipts
+
+The system is designed to be scalable and modular so it can grow to
+support a large number of users.
+
+------------------------------------------------------------------------
+
+2.  TECHNOLOGY STACK
+
+Backend: ASP.NET Core 8.0 Web API SignalR (for real-time communication)
+MongoDB Driver JWT Authentication MongoDB Atlas (cloud-hosted)
+
+Frontend: Angular 18 Angular Material RxJS
+
+Database: MongoDB Atlas (cloud-hosted NoSQL database)
+
+Caching and Presence: Redis (localhost:6379)
+
+Storage: Messages stored in MongoDB collections
+
+------------------------------------------------------------------------
+
+3.  IMPLEMENTATION STATUS
+
+✅ COMPLETED:
+- User authentication and registration with JWT tokens
+- MongoDB database integration with GUID serialization
+- Basic user management and profiles
+- Health check endpoint for API verification
+- JWT token attachment in HTTP interceptor
+- SignalR Hub with SendMessage, Typing, MarkAsRead methods
+- Message persistence in MongoDB
+- Create or get direct chat between users
+- Message loading with pagination
+- SignalR connection initialization in chat layout component
+- Signal handlers for received messages, user online/offline, typing
+
+⏳ IN PROGRESS / NEXT STEPS:
+- Connection request system (endpoints added, database integration pending)
+- Chat request system (endpoints added, database integration pending)
+- Read receipts system (backend method exists, frontend implementation pending)
+- Typing indicators (partially working, needs testing)
+- Presence tracking (Redis connection issues - will work without Redis)
+- Advanced message pagination features
+
+RECENT FIXES (March 9, 2026 - Session 2):
+- Fixed JWT interceptor to use correct backend URL (http://localhost:5142)
+- Added email field to user registration form
+- Implemented MongoDB GUID serialization (GuidRepresentation.Standard)
+- Fixed SignalR service initialization:
+  * ChatLayoutComponent now initializes SignalR on component load
+  * Proper cleanup on component destroy
+  * StopConnection called on logout
+- Added connection request endpoints (POST /api/chat/connection-request/{targetUserId})
+- Added accept/reject connection request endpoints
+- Message window component properly listens to SignalR messages
+- SendMessage method invokes ChatHub.SendMessage
+
+------------------------------------------------------------------------
+
+3.  SYSTEM ARCHITECTURE
+
+The project follows a layered modular architecture.
+
+Layers:
+
+Client Layer Frontend Angular application that users interact with.
+
+API Layer ASP.NET Core controllers that expose REST APIs.
+
+Service Layer Contains business logic such as connection handling,
+messaging logic, and chat creation.
+
+Data Access Layer Entity Framework Core repositories that interact with
+the database.
+
+Database Layer Stores persistent data such as users, chats, and
+messages.
+
+------------------------------------------------------------------------
+
+4.  AUTHENTICATION SYSTEM
+
+The authentication system secures the application and ensures only
+authorized users can access the chat system.
+
+Process:
+
+1.  User registers with username, email, and password.
+2.  Password is hashed before storage.
+3.  User logs in with credentials.
+4.  Server verifies credentials.
+5.  JWT token is generated.
+6.  Token is returned to client.
+7.  Client includes token in every API request.
+
+This token-based system ensures secure communication.
+
+------------------------------------------------------------------------
+
+5.  USER MANAGEMENT
+
+Users can create and manage their profiles.
+
+User data includes:
+
+UserId Username Email PasswordHash AvatarUrl CreatedAt
+
+Users can: - Update profile - View other user profiles - Send connection
+requests
+
+------------------------------------------------------------------------
+
+6.  CONNECTION REQUEST SYSTEM
+
+Before chatting, users must establish a connection.
+
+Connection workflow:
+
+1.  User A sends a connection request to User B.
+2.  Request is stored in database.
+3.  User B receives notification.
+4.  User B can accept or reject the request.
+5.  If accepted, both users become connections.
+
+Connection status types:
+
+Pending Accepted Rejected Blocked
+
+This prevents spam messages from unknown users.
+
+------------------------------------------------------------------------
+
+7.  CHAT REQUEST SYSTEM
+
+After users are connected, they can start a chat.
+
+Chat creation process:
+
+1.  User A sends chat request to User B.
+2.  System verifies both users are connected.
+3.  If valid, a chat room is created.
+4.  Both users are added as participants.
+
+Chat tables:
+
+Chats ChatParticipants
+
+This design allows both private chats and future group chats.
+
+------------------------------------------------------------------------
+
+8.  REAL-TIME MESSAGING SYSTEM
+
+Messaging uses WebSocket communication.
+
+SignalR Hub handles live communication.
+
+Message sending workflow:
+
+1.  User types a message.
+2.  Message is sent to server.
+3.  Server stores message in database.
+4.  SignalR broadcasts message to chat participants.
+5.  Receiver instantly receives the message.
+
+This enables real-time chat functionality.
+
+------------------------------------------------------------------------
+
+9.  MESSAGE STORAGE
+
+Messages are stored in the database.
+
+Message fields:
+
+MessageId ChatId SenderId Content SentAt IsRead
+
+Messages are loaded with pagination to improve performance.
+
+Example: Load last 50 messages in a chat.
+
+------------------------------------------------------------------------
+
+10. TYPING INDICATORS
+
+Typing indicators improve user experience.
+
+Process:
+
+1.  User begins typing.
+2.  Client sends typing event to server.
+3.  Server broadcasts event to chat participants.
+4.  Other users see “User is typing…”
+
+------------------------------------------------------------------------
+
+11. READ RECEIPTS
+
+Read receipts show when a message has been seen.
+
+Process:
+
+1.  Message delivered to receiver.
+2.  Receiver opens chat.
+3.  Message status updated to read.
+4.  Sender receives read confirmation.
+
+------------------------------------------------------------------------
+
+12. PRESENCE SYSTEM
+
+Presence indicates whether a user is online or offline.
+
+Process:
+
+1.  User connects to SignalR.
+2.  Server records connection in Redis.
+3.  User status marked as online.
+4.  Friends receive presence update.
+
+When user disconnects:
+
+1.  Connection removed from Redis.
+2.  User status updated to offline.
+
+------------------------------------------------------------------------
+
+13. MESSAGE HISTORY
+
+Chat history is stored in the database.
+
+API example:
+
+GET /api/messages/chat/{chatId}?page=1&pageSize=50
+
+Pagination ensures fast performance for large chat histories.
+
+------------------------------------------------------------------------
+
+14. SECURITY FEATURES
+
+Security mechanisms include:
+
+JWT authentication Password hashing Secure API endpoints Authorization
+middleware Token validation
+
+These protect user data and prevent unauthorized access.
+
+------------------------------------------------------------------------
+
+15. SCALABILITY
+
+The system can scale horizontally.
+
+Scaling strategy:
+
+Multiple API servers Redis backplane for SignalR Load balancer Cloud
+database
+
+Architecture:
+
+Client Load Balancer API Servers Redis Database
+
+This architecture allows the system to support thousands of users.
+
+------------------------------------------------------------------------
+
+16. FUTURE IMPROVEMENTS
+
+Possible enhancements:
+
+Group chat File sharing Voice messages Video calls Push notifications AI
+moderation End-to-end encryption
+
+------------------------------------------------------------------------
+
+17. CONCLUSION
+
+The Chat Platform demonstrates a modern real-time communication system
+using scalable technologies. The system includes secure authentication,
+connection management, real-time messaging, and persistent message
+storage.
+
+The architecture allows easy extension and scaling, making it suitable
+for modern communication applications.
