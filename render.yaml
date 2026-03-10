@@ -4,7 +4,7 @@ services:
     name: chat-api
     env: docker
     dockerContext: ChatPlatform
-    dockerfilePath: Dockerfile
+    dockerfilePath: ChatPlatform/Dockerfile
     plan: free # or starter
     envVars:
       - key: ConnectionStrings__MongoDb
@@ -28,7 +28,7 @@ services:
     name: chat-frontend
     env: docker
     dockerContext: frontend
-    dockerfilePath: Dockerfile
+    dockerfilePath: frontend/Dockerfile
     plan: free # or starter
     envVars:
       - key: API_URL
