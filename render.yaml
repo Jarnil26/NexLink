@@ -21,7 +21,7 @@ services:
       - key: Jwt__Audience
         value: ChatPlatformClients
       - key: AllowedOrigins
-        value: https://chat-frontend-kuj4.onrender.com # Updated with your actual URL suffix
+        value: https://chat-frontend-kuj4.onrender.com
 
   # Frontend Web App
   - type: web
@@ -32,7 +32,7 @@ services:
     plan: free
     envVars:
       - key: API_URL
-        value: https://chat-api.onrender.com # You may need to update this suffix after backend is live
+        value: https://chat-api-582i.onrender.com
 
   # Redis Instance
   - type: redis
