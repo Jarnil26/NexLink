@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ChatService } from '../../../core/services/chat.service';
 import { SignalrService } from '../../../core/services/signalr.service';
 import { AuthService } from '../../../core/services/auth.service';
+import { UserService } from '../../../core/services/user.service';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -41,7 +42,8 @@ export class MessageWindowComponent implements OnInit, OnChanges, AfterViewCheck
   constructor(
     private chatService: ChatService,
     private signalRService: SignalrService,
-    private authService: AuthService
+    private authService: AuthService,
+    private userService: UserService
   ) {}
 
   ngOnInit() {
@@ -248,6 +250,19 @@ export class MessageWindowComponent implements OnInit, OnChanges, AfterViewCheck
       },
       error: (err) => alert(err.error?.message || 'Failed to send request')
     });
+  }
+
+  blockUser() {
+    if (!this.otherUser?.id) return;
+    if (confirm(`Are you sure you want to block ${this.otherUser.username}? This will remove them from your active chats.`)) {
+      this.userService.blockUser(this.otherUser.id).subscribe({
+        next: () => {
+          alert('User has been blocked.');
+          this.close(); // Close the chat window automatically
+        },
+        error: (err) => alert('Failed to block user. They might already be blocked.')
+      });
+    }
   }
 
   onTyping() {

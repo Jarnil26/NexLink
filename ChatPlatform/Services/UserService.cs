@@ -121,4 +121,52 @@ public class UserService : IUserService
         var update = Builders<Core.Entities.User>.Update.Set(u => u.IsOnline, isOnline);
         await usersCollection.UpdateOneAsync(u => u.Id == userId, update);
     }
+
+    public async Task<bool> BlockUserAsync(Guid blockerId, Guid blockedId)
+    {
+        var db = _mongoClient.GetDatabase("chatplatform");
+        var blocks = db.GetCollection<UserBlock>("UserBlocks");
+        var connRequests = db.GetCollection<ConnectionRequest>("ConnectionRequests");
+        var chatRequests = db.GetCollection<ChatRequest>("ChatRequests");
+
+        // 1. Check if already blocked
+        var existingBlock = await blocks.Find(b => b.BlockerId == blockerId && b.BlockedId == blockedId).FirstOrDefaultAsync();
+        if (existingBlock != null) return true; // Already blocked
+
+        // 2. Insert Block Record
+        await blocks.InsertOneAsync(new UserBlock
+        {
+            BlockerId = blockerId,
+            BlockedId = blockedId,
+            CreatedAt = DateTime.UtcNow
+        });
+
+        // 3. Remove existing Connection Requests between the two
+        var connFilter = Builders<ConnectionRequest>.Filter.Or(
+            Builders<ConnectionRequest>.Filter.And(
+                Builders<ConnectionRequest>.Filter.Eq(r => r.FromUserId, blockerId),
+                Builders<ConnectionRequest>.Filter.Eq(r => r.ToUserId, blockedId)
+            ),
+            Builders<ConnectionRequest>.Filter.And(
+                Builders<ConnectionRequest>.Filter.Eq(r => r.FromUserId, blockedId),
+                Builders<ConnectionRequest>.Filter.Eq(r => r.ToUserId, blockerId)
+            )
+        );
+        await connRequests.DeleteManyAsync(connFilter);
+
+        // 4. Remove existing Chat Requests between the two
+        var chatFilter = Builders<ChatRequest>.Filter.Or(
+            Builders<ChatRequest>.Filter.And(
+                Builders<ChatRequest>.Filter.Eq(r => r.FromUserId, blockerId),
+                Builders<ChatRequest>.Filter.Eq(r => r.ToUserId, blockedId)
+            ),
+            Builders<ChatRequest>.Filter.And(
+                Builders<ChatRequest>.Filter.Eq(r => r.FromUserId, blockedId),
+                Builders<ChatRequest>.Filter.Eq(r => r.ToUserId, blockerId)
+            )
+        );
+        await chatRequests.DeleteManyAsync(chatFilter);
+
+        return true;
+    }
 }

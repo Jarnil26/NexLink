@@ -47,4 +47,21 @@ public class UserController : ControllerBase
         var users = await _userService.SearchUsersAsync(q, userId);
         return Ok(users);
     }
+
+    [HttpPost("{id}/block")]
+    public async Task<IActionResult> BlockUser(Guid id)
+    {
+        var blockerId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        
+        if (blockerId == id)
+            return BadRequest("You cannot block yourself.");
+
+        var result = await _userService.BlockUserAsync(blockerId, id);
+        if (result)
+        {
+            return Ok(new { message = "User blocked successfully." });
+        }
+        
+        return BadRequest("Failed to block user.");
+    }
 }

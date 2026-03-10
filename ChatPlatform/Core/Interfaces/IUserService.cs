@@ -10,4 +10,5 @@ public interface IUserService
     Task<UserDto?> GetUserByUsernameAsync(string username);
     Task<List<UserDto>> SearchUsersAsync(string query, Guid currentUserId);
     Task UpdateUserStatusAsync(Guid userId, bool isOnline);
+    Task<bool> BlockUserAsync(Guid blockerId, Guid blockedId);
 }
