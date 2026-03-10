@@ -3,9 +3,8 @@ services:
   - type: web
     name: chat-api
     env: docker
-    dockerContext: ChatPlatform
-    dockerfilePath: Dockerfile
-    plan: free # or starter
+    rootDir: ChatPlatform
+    plan: free
     envVars:
       - key: ConnectionStrings__MongoDb
         sync: false
@@ -27,9 +26,8 @@ services:
   - type: web
     name: chat-frontend
     env: docker
-    dockerContext: frontend
-    dockerfilePath: Dockerfile
-    plan: free # or starter
+    rootDir: frontend
+    plan: free
     envVars:
       - key: API_URL
         value: https://chat-api.onrender.com
@@ -37,5 +35,5 @@ services:
   # Redis Instance
   - type: redis
     name: chat-redis
-    plan: free # or starter
-    ipAllowList: [] # Only allow internal traffic
+    plan: free
+    ipAllowList: []
