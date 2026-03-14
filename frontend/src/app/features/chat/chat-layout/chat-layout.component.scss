@@ -1,6 +1,7 @@
 .app-container {
   display: flex;
-  height: 100vh;
+  height: 100%;
+  height: 100dvh;
   background: var(--bg-primary);
   color: var(--text-primary);
   overflow: hidden;
