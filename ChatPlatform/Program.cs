@@ -108,14 +108,9 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 // CORS
 builder.Services.AddCors(options =>
 {
-    var allowedOriginsString = builder.Configuration["AllowedOrigins"];
-    var allowedOrigins = string.IsNullOrEmpty(allowedOriginsString) 
-        ? new[] { "http://localhost:4200", "https://saaniq.me", "http://saaniq.me", "https://www.saaniq.me" } 
-        : allowedOriginsString.Split(',').Select(o => o.Trim()).ToArray();
-        
     options.AddPolicy("CorsPolicy", policyBuilder =>
     {
-        policyBuilder.WithOrigins(allowedOrigins)
+        policyBuilder.SetIsOriginAllowed(origin => true) // Allow any origin dynamically
                .AllowAnyMethod()
                .AllowAnyHeader()
                .AllowCredentials();
@@ -125,6 +120,7 @@ builder.Services.AddCors(options =>
 var app = builder.Build();
 
 app.UseStaticFiles();
+app.UseRouting(); // Standard practice: UseRouting before UseCors
 app.UseCors("CorsPolicy");
 app.UseHttpsRedirection();
 
