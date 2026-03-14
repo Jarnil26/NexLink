@@ -352,10 +352,24 @@
     padding-bottom: env(safe-area-inset-bottom);
   }
 
+  /* Aggressive Fix: Hide everything else when chat is active */
   .app-container.active-chat {
-    .sidebar-content {
-      visibility: hidden;
-      pointer-events: none;
+    .nav-sidebar, .sidebar-content {
+      display: none !important;
+    }
+
+    .main-area {
+      transform: translateX(0);
+      visibility: visible;
+      pointer-events: auto;
+      // Use absolute pinning to avoid height calculation bugs
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: auto;
+      width: 100%;
     }
   }
 
@@ -365,7 +379,7 @@
     left: 0;
     bottom: 0;
     width: 100%;
-    height: 100dvh; // Full dynamic viewport height
+    height: 100dvh; 
     background: var(--bg-primary);
     z-index: 2000;
     transform: translateX(100%);
