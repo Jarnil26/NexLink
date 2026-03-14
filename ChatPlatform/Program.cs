@@ -108,10 +108,14 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 // CORS
 builder.Services.AddCors(options =>
 {
-    var allowedOrigins = builder.Configuration["AllowedOrigins"]?.Split(',') ?? new[] { "http://localhost:4200" };
-    options.AddPolicy("CorsPolicy", builder =>
+    var allowedOriginsString = builder.Configuration["AllowedOrigins"];
+    var allowedOrigins = string.IsNullOrEmpty(allowedOriginsString) 
+        ? new[] { "http://localhost:4200", "https://saaniq.me", "http://saaniq.me", "https://www.saaniq.me" } 
+        : allowedOriginsString.Split(',').Select(o => o.Trim()).ToArray();
+        
+    options.AddPolicy("CorsPolicy", policyBuilder =>
     {
-        builder.WithOrigins(allowedOrigins)
+        policyBuilder.WithOrigins(allowedOrigins)
                .AllowAnyMethod()
                .AllowAnyHeader()
                .AllowCredentials();
