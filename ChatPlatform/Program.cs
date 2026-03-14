@@ -71,6 +71,7 @@ builder.Services.AddScoped<IChatService, ChatService>();
 builder.Services.AddScoped<IMessageService, MessageService>();
 builder.Services.AddScoped<IConnectionRequestService, ConnectionRequestService>();
 builder.Services.AddScoped<IChatRequestService, ChatRequestService>();
+builder.Services.AddScoped<IPushNotificationService, PushNotificationService>();
 
 // Authentication
 var jwtKey = builder.Configuration["Jwt:Key"] ?? throw new InvalidOperationException("JWT Key is missing");

@@ -31,4 +31,7 @@ public class User
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     public ICollection<ChatParticipant> ChatParticipants { get; set; } = new List<ChatParticipant>();
+
+    [BsonElement("pushSubscriptions")]
+    public List<PushSubscriptionModel> PushSubscriptions { get; set; } = new List<PushSubscriptionModel>();
 }

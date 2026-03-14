@@ -3,6 +3,7 @@ import { RouterOutlet } from '@angular/router';
 import { AuthService } from './core/services/auth.service';
 import { SignalrService } from './core/services/signalr.service';
 import { Subscription } from 'rxjs';
+import { PushNotificationService } from './services/push-notification.service';
 
 @Component({
   selector: 'app-root',
@@ -17,7 +18,8 @@ export class AppComponent implements OnInit, OnDestroy {
 
   constructor(
     private authService: AuthService,
-    private signalrService: SignalrService
+    private signalrService: SignalrService,
+    private pushNotificationService: PushNotificationService
   ) {}
 
   ngOnInit() {
@@ -25,6 +27,7 @@ export class AppComponent implements OnInit, OnDestroy {
       if (user) {
         this.signalrService.startConnection();
         this.applyTheme(user.theme || 'system');
+        this.pushNotificationService.subscribeToNotifications();
       } else {
         this.signalrService.stopConnection();
         this.applyTheme('system');

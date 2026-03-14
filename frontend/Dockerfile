@@ -12,8 +12,8 @@ RUN npm run build -- --configuration production
 
 # Production Stage
 FROM nginx:alpine
-# Copy custom nginx config if we had one, but default is often fine for simple SPAs
-# COPY nginx.conf /etc/nginx/conf.d/default.conf
+# Copy custom nginx config
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=build /app/dist/frontend/browser /usr/share/nginx/html
 
 # Expose port (Nginx default is 80)

@@ -13,11 +13,13 @@ public class MessageService : IMessageService
 {
     private readonly IMongoClient _mongoClient;
     private readonly IChatRequestService _chatRequestService;
+    private readonly IPushNotificationService _pushNotificationService;
 
-    public MessageService(IMongoClient mongoClient, IChatRequestService chatRequestService)
+    public MessageService(IMongoClient mongoClient, IChatRequestService chatRequestService, IPushNotificationService pushNotificationService)
     {
         _mongoClient = mongoClient;
         _chatRequestService = chatRequestService;
+        _pushNotificationService = pushNotificationService;
     }
 
     public async Task<MessageDto> SendMessageAsync(Guid senderId, SendMessageDto sendMessageDto)
@@ -59,6 +61,21 @@ public class MessageService : IMessageService
         await chatsCollection.UpdateOneAsync(Builders<Chat>.Filter.Eq(c => c.Id, sendMessageDto.ChatId), update);
 
         var sender = await usersCollection.Find(u => u.Id == senderId).FirstOrDefaultAsync();
+
+        // Send push notification if other user is not online or for simplicity we just send it if they have subscriptions
+        if (otherUserId.HasValue)
+        {
+            var receiver = await usersCollection.Find(u => u.Id == otherUserId.Value).FirstOrDefaultAsync();
+            if (receiver != null && receiver.PushSubscriptions.Any())
+            {
+                await _pushNotificationService.SendPushNotificationAsync(
+                    receiver.PushSubscriptions,
+                    sender?.Username ?? "Someone",
+                    message.Content,
+                    $"/chat"
+                );
+            }
+        }
 
         return new MessageDto
         {

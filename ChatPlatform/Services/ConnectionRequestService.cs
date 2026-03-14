@@ -15,12 +15,14 @@ public class ConnectionRequestService : IConnectionRequestService
     private readonly IMongoClient _mongoClient;
     private readonly IUserService _userService;
     private readonly IHubContext<ChatHub> _hubContext;
+    private readonly IPushNotificationService _pushNotificationService;
 
-    public ConnectionRequestService(IMongoClient mongoClient, IUserService userService, IHubContext<ChatHub> hubContext)
+    public ConnectionRequestService(IMongoClient mongoClient, IUserService userService, IHubContext<ChatHub> hubContext, IPushNotificationService pushNotificationService)
     {
         _mongoClient = mongoClient;
         _userService = userService;
         _hubContext = hubContext;
+        _pushNotificationService = pushNotificationService;
     }
 
     public async Task<ConnectionRequestDto> SendConnectionRequestAsync(Guid fromUserId, Guid toUserId)
@@ -80,6 +82,18 @@ public class ConnectionRequestService : IConnectionRequestService
 
         // Notify recipient via SignalR
         await _hubContext.Clients.User(toUserId.ToString()).SendAsync("receive_connection_request", requestDto);
+
+        var usersCollection = db.GetCollection<User>("Users");
+        var toUser = await usersCollection.Find(u => u.Id == toUserId).FirstOrDefaultAsync();
+        if (toUser != null && toUser.PushSubscriptions.Any())
+        {
+            await _pushNotificationService.SendPushNotificationAsync(
+                toUser.PushSubscriptions,
+                "New Connection Request",
+                $"{fromUser?.Username ?? "Someone"} sent you a connection request.",
+                "/friends"
+            );
+        }
 
         return requestDto;
     }
