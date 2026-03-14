@@ -218,10 +218,10 @@
     }
 
     .send-circle {
-      flex-shrink: 0; /* Important: prevents flattening */
-      aspect-ratio: 1 / 1; /* Force perfect circle */
+      flex: 0 0 50px; /* Force fix size */
       width: 50px;
       height: 50px;
+      aspect-ratio: 1 / 1;
       border-radius: 50%;
       background: var(--accent);
       color: #fff;
@@ -233,6 +233,7 @@
       font-size: 18px;
       transition: var(--transition);
       box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+      overflow: hidden;
 
       &:hover:not(:disabled) {
         background: var(--accent-hover);
@@ -370,8 +371,7 @@
       }
 
       .send-circle {
-        flex-shrink: 0;
-        aspect-ratio: 1 / 1;
+        flex: 0 0 44px; /* Force fix size on mobile */
         width: 44px;
         height: 44px;
         font-size: 16px;
