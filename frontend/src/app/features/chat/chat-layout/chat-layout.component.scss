@@ -5,6 +5,7 @@
   background: var(--bg-primary);
   color: var(--text-primary);
   overflow: hidden;
+  overscroll-behavior: none;
 }
 
 /* 1. Navigation Sidebar (70px) */
