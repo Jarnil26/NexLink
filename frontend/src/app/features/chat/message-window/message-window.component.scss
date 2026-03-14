@@ -171,11 +171,13 @@
 
   /* 3. Input Area */
   .chat-input-area {
-    padding: 24px 32px;
-    background: transparent;
+    padding: 16px 32px;
+    background: var(--bg-primary); /* Solid background to prevent "floating" look */
+    border-top: 1px solid var(--border);
     display: flex;
     align-items: center;
     gap: 16px;
+    z-index: 5;
 
     .input-pill {
       flex: 1;
@@ -354,6 +356,9 @@
     .chat-input-area {
       padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
       gap: 12px;
+      // Fixed at the very bottom
+      background: var(--bg-primary);
+      border-top: 1px solid var(--border);
 
       .input-pill {
         padding: 4px 12px;

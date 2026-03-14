@@ -65,15 +65,23 @@ public class MessageService : IMessageService
         // Send push notification if other user is not online or for simplicity we just send it if they have subscriptions
         if (otherUserId.HasValue)
         {
-            var receiver = await usersCollection.Find(u => u.Id == otherUserId.Value).FirstOrDefaultAsync();
-            if (receiver != null && receiver.PushSubscriptions.Any())
+            try 
             {
-                await _pushNotificationService.SendPushNotificationAsync(
-                    receiver.PushSubscriptions,
-                    sender?.Username ?? "Someone",
-                    message.Content,
-                    $"/chat"
-                );
+                var receiver = await usersCollection.Find(u => u.Id == otherUserId.Value).FirstOrDefaultAsync();
+                if (receiver != null && receiver.PushSubscriptions.Any())
+                {
+                    await _pushNotificationService.SendPushNotificationAsync(
+                        receiver.PushSubscriptions,
+                        sender?.Username ?? "Someone",
+                        message.Content,
+                        $"/chat"
+                    );
+                }
+            }
+            catch (Exception ex)
+            {
+                // We log the error but don't fail the message sending process
+                Console.WriteLine($"[MessageService] Push notification failed: {ex.Message}");
             }
         }
 

@@ -224,10 +224,13 @@ export class MessageWindowComponent implements OnInit, OnChanges, AfterViewCheck
   sendMessage() {
     if (!this.newMessage.trim() || !this.chatId) return;
 
-    this.signalRService.sendMessage(this.chatId, this.newMessage).catch(err => {
-      alert(err.message || 'Failed to send message');
+    const content = this.newMessage;
+    this.signalRService.sendMessage(this.chatId, content).then(() => {
+        this.newMessage = '';
+    }).catch(err => {
+      console.error('Failed to send message:', err);
+      alert(typeof err === 'string' ? err : 'Failed to send message. Please check your connection.');
     });
-    this.newMessage = '';
   }
 
   sendChatRequest() {
